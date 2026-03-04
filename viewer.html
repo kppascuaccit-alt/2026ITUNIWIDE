@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IT UNIWIDE - Live Leaderboard</title>
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg,#141E30,#243B55);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+h1 { color: gold; }
+h2 { color: #FFD700; margin-top: 40px; }
+
+/* SUMMARY STYLES */
+#eventSummary {
+    margin-bottom: 30px;
+    text-align: left;
+}
+#eventSummary div {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+}
+
+/* PODIUM STYLES */
+.podium {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+.podium-box {
+  width: 200px;
+  text-align: center;
+  border-radius: 10px;
+  padding: 15px;
+  font-weight: bold;
+  transition: 0.3s ease;
+}
+.first { background: gold; height: 200px; transform: scale(1.1); }
+.second { background: silver; height: 160px; }
+.third { background: #cd7f32; height: 130px; }
+.podium-box h3 { margin: 5px 0; font-size: 24px; }
+.podium-box p, .podium-box span { font-size: 18px; margin: 0; }
+
+/* TABLE STYLES */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    color: black;
+}
+th {
+    background: #2c3e50;
+    color: white;
+    padding: 10px;
+}
+td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+.champion td { background: gold; font-weight: bold; }
+.second-place td { background: silver; font-weight: bold; }
+.third-place td { background: #cd7f32; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>🏆 IT UNIWIDE - Live Leaderboard</h1>
+
+<!-- EVENT SUMMARY -->
+<h2>📊 Event Summary - Top 3 per Event</h2>
+<div id="eventSummary"></div>
+
+<!-- PODIUM TOP 3 -->
+<div class="podium">
+  <div class="podium-box second">
+    <h3>🥈 2nd</h3>
+    <p id="secondName"></p>
+    <span id="secondScore">0 pts</span>
+  </div>
+
+  <div class="podium-box first">
+    <h3>🥇 1st</h3>
+    <p id="firstName"></p>
+    <span id="firstScore">0 pts</span>
+  </div>
+
+  <div class="podium-box third">
+    <h3>🥉 3rd</h3>
+    <p id="thirdName"></p>
+    <span id="thirdScore">0 pts</span>
+  </div>
+</div>
+
+<!-- LEADERBOARD TABLE -->
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>School</th>
+<th>Total</th>
+<th>🥇</th>
+<th>🥈</th>
+<th>🥉</th>
+</tr>
+</thead>
+<tbody id="leaderboardBody"></tbody>
+</table>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyC_s66HwsvpNKpLeZtxKC8vl1UTdmK21kg",
+  authDomain: "it-f089d.firebaseapp.com",
+  projectId: "it-f089d",
+  storageBucket: "it-f089d.firebasestorage.app",
+  messagingSenderId: "827972622",
+  appId: "1:827972622:web:809c13c3c35c5142b2b05f"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Schools & Events MUST match admin.html
+const schools = [
+    "CSU SOLANA","CSU CARIG","CSU LALLO","CSU SANCHEZ-MIRA",
+    "CSU LASAM","CSU PIAT","CSU APARRI","CSU GONZAGA","CSU ANDREWS"
+];
+const events = [
+    "Database Programming","Web Development (Static)",
+    "Web Development (Dynamic)","Digital Poster",
+    "Digital Slogan","Photo Journalism",
+    "Mobile Vlogging","Extemporaneous Speech",
+    "Research Presentation","Quiz Bee","UI/UX Design"
+];
+
+// Real-time listener
+onSnapshot(doc(db,"leaderboard","main"), (docSnap) => {
+    const tbody = document.getElementById("leaderboardBody");
+    const summaryDiv = document.getElementById("eventSummary");
+
+    let firstName = "";
+    let secondName = "";
+    let thirdName = "";
+    let firstScore = "0 pts";
+    let secondScore = "0 pts";
+    let thirdScore = "0 pts";
+
+    summaryDiv.innerHTML = "";
+
+    if(docSnap.exists() && docSnap.data().data){
+        const data = docSnap.data().data;
+        const arr = Object.entries(data);
+
+        // --------- MAIN PODIUM & TABLE ---------
+        arr.sort((a,b)=>{
+            if(b[1].total !== a[1].total) return b[1].total - a[1].total;
+            if(b[1].first !== a[1].first) return b[1].first - a[1].first;
+            if(b[1].second !== a[1].second) return b[1].second - a[1].second;
+            return b[1].third - a[1].third;
+        });
+
+        const top3 = arr.filter(item => item[1].total > 0);
+        if(top3[0]) { firstName = top3[0][0]; firstScore = top3[0][1].total + " pts"; }
+        if(top3[1]) { secondName = top3[1][0]; secondScore = top3[1][1].total + " pts"; }
+        if(top3[2]) { thirdName = top3[2][0]; thirdScore = top3[2][1].total + " pts"; }
+
+        tbody.innerHTML = "";
+        let rankCounter = 0;
+        arr.forEach(item => {
+            const rank = item[1].total > 0 ? ++rankCounter : 0;
+            let cls = rank==1?"champion":rank==2?"second-place":rank==3?"third-place":"";
+            tbody.innerHTML += `
+                <tr class="${cls}">
+                <td>${rank}</td>
+                <td>${item[0]}</td>
+                <td>${item[1].total}</td>
+                <td>${item[1].first}</td>
+                <td>${item[1].second}</td>
+                <td>${item[1].third}</td>
+                </tr>`;
+        });
+
+        // --------- EVENT SUMMARY ---------
+        events.forEach(event => {
+            // Only include schools that have a position recorded
+            let ranking = [];
+            for (let school of schools){
+                const pos = data[school]?.events?.[event];
+                if(pos) ranking.push([school,pos]);
+            }
+
+            // Sort ascending
+            ranking.sort((a,b)=>a[1]-b[1]);
+
+            if(ranking.length > 0){
+                const topEvent = ranking.slice(0,3);
+                summaryDiv.innerHTML += `
+                    <div>
+                        <strong>${event}</strong>: ${topEvent.map((t,i)=>`${i+1}️⃣ ${t[0]}`).join(", ")}
+                    </div>`;
+            }
+        });
+    }
+
+    // UPDATE PODIUM DOM
+    document.getElementById("firstName").textContent = firstName;
+    document.getElementById("firstScore").textContent = firstScore;
+    document.getElementById("secondName").textContent = secondName;
+    document.getElementById("secondScore").textContent = secondScore;
+    document.getElementById("thirdName").textContent = thirdName;
+    document.getElementById("thirdScore").textContent = thirdScore;
+});
+</script>
+</body>
+</html>

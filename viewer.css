@@ -1,0 +1,145 @@
+/* BODY & FONTS */
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #141E30, #243B55);
+    margin: 0;
+    padding: 30px;
+    color: #d9ca7fdf;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3em;
+    text-transform: uppercase;
+    color: #FFD700;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+}
+
+/* PODIUM STYLING */
+.podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.podium {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    border-radius: 12px 12px 0 0;
+    padding: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+.podium:hover {
+    transform: scale(1.1) translateY(-5px);
+    box-shadow: 0 15px 30px rgba(255,255,255,0.2);
+}
+
+.podium.first { background: gold; width: 120px; color:black; }
+.podium.second { background: silver; width: 100px; color:black; }
+.podium.third { background: #cd7f32; width: 80px; color:black; }
+
+.podium-rank { font-size: 22px; font-family: 'Orbitron', sans-serif; }
+.podium-school { font-size: 16px; font-weight: 500; }
+.podium-points { font-size: 14px; margin-top: 5px; }
+
+/* LEADERBOARD TABLE */
+.leaderboard-container { width: 100%; max-width: 1000px; margin: 0 auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    background: rgb(226, 226, 192);
+    color: #333;
+    margin-bottom: 15px;
+    font-family: 'Roboto', sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* HEADER STYLING */
+th {
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    color: white;
+    padding: 12px;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* BODY CELLS */
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    transition: all 0.3s ease, background 0.5s ease;
+}
+
+/* ROW HOVER EFFECT */
+tr:hover {
+    background-color: #fce4ec;
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* STRIPED ROWS */
+tbody tr:nth-child(odd) {
+    background-color: rgba(255,255,255,0.1);
+}
+tbody tr:nth-child(even) {
+    background-color: rgba(255,255,255,0.05);
+}
+
+/* TOP 3 HIGHLIGHT COLORS */
+.champion td {
+    background: linear-gradient(45deg,#FFD700,#FFB700);
+    font-weight:bold;
+    color:black;
+    box-shadow: 0 5px 20px rgba(255,215,0,0.5);
+    transition: all 0.5s ease;
+}
+.second-place td {
+    background: linear-gradient(45deg,#C0C0C0,#A9A9A9);
+    font-weight:bold;
+    color:black;
+    box-shadow: 0 5px 20px rgba(192,192,192,0.5);
+    transition: all 0.5s ease;
+}
+.third-place td {
+    background: linear-gradient(45deg,#CD7F32,#B87333);
+    font-weight:bold;
+    color:black;
+    box-shadow: 0 5px 20px rgba(205,127,50,0.5);
+    transition: all 0.5s ease;
+}
+
+/* RANK BADGES ANIMATION */
+td:first-child {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+tr.champion td:first-child { color: #FFD700; transform: scale(1.1); }
+tr.second-place td:first-child { color: #C0C0C0; transform: scale(1.05); }
+tr.third-place td:first-child { color: #CD7F32; transform: scale(1.05); }
+
+/* SMOOTH TRANSITIONS FOR POINTS UPDATES */
+td:nth-child(n+3) {
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 1024px){
+    .podium-container { flex-wrap: wrap; gap: 10px; justify-content: center; }
+    table { font-size: 14px; }
+    th, td { padding: 8px; }
+}

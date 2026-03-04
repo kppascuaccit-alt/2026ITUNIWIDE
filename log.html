@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IT UNIWIDE - Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #141E30, #243B55);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    width: 320px;
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 30px;
+    color: #FFD700;
+}
+
+input {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: none;
+    font-size: 16px;
+}
+
+button {
+    width: 80%;               /* SAME WIDTH */
+    padding: 12px 0;          /* SAME HEIGHT */
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #27ae60;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    opacity: 0.85;
+    transform: scale(1.03);
+}
+
+button.viewer {
+    background: #3498db;
+}
+
+#errorMsg {
+    color: #ff4b2b;
+    margin-top: 10px;
+    height: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-container">
+    <h1>Login</h1>
+
+    <input type="password" id="passwordInput" placeholder="Enter Password">
+    <br>
+
+    <button onclick="login()">Admin Login</button>
+    <br>
+
+    <button class="viewer" onclick="goViewer()">Viewer Dashboard</button>
+
+    <p id="errorMsg"></p>
+</div>
+
+<script>
+const ADMIN_PASSWORD = "IT2026"; // Change to your secure password
+
+function login(){
+    const input = document.getElementById("passwordInput").value;
+    const error = document.getElementById("errorMsg");
+
+    if(input === ADMIN_PASSWORD){
+        window.location.href = "admin.html";
+    } else {
+        error.textContent = "Incorrect password!";
+    }
+}
+
+function goViewer(){
+    window.location.href = "viewer.html";
+}
+</script>
+
+</body>
+</html>
