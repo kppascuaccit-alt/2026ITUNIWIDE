@@ -100,7 +100,7 @@ td {
 <button class="export-btn" onclick="exportReport()">Export Full Report</button>
 </div>
 
-<!-- LEADERBOARD TABLE -->
+<!-- LEADERBOARD -->
 <div class="leaderboard-container">
 <h2>Leaderboard</h2>
 <table id="leaderboard">
@@ -118,7 +118,7 @@ td {
 </table>
 </div>
 
-<!-- EVENT TOP 3 TABLE -->
+<!-- EVENT TOP 3 -->
 <div class="leaderboard-container">
 <h2>Top 3 per Event</h2>
 <table id="eventTop3">
@@ -175,9 +175,9 @@ function getPoints(pos){
            pos==6?1:0;
 }
 
-// Initialize data and assigned
 let data = {};
 let assigned = {};
+
 schools.forEach(s => {
     data[s] = { total:0, first:0, second:0, third:0, events:{} };
 });
@@ -209,7 +209,6 @@ function createAdminPanel(){
     });
 }
 
-// Assign points when selecting winners
 window.assignPoints = async function(event,pos,select){
     const school=select.value;
     if(!school) return;
@@ -217,7 +216,6 @@ window.assignPoints = async function(event,pos,select){
     if(!data[school]) data[school]={total:0,first:0,second:0,third:0,events:{}};
     if(!assigned[event]) assigned[event]={};
 
-    // Remove previous school in this position
     if(assigned[event][pos]){
         const prevSchool = assigned[event][pos];
         const prevPts = getPoints(pos);
@@ -228,7 +226,6 @@ window.assignPoints = async function(event,pos,select){
         delete data[prevSchool].events[event];
     }
 
-    // Prevent duplicate rankings
     for(let p in assigned[event]){
         if(assigned[event][p]===school){
             alert("School already ranked in this event");
@@ -264,7 +261,6 @@ window.resetScores = async function(){
     }
 };
 
-// Update leaderboard table
 function updateLeaderboard(){
     const tbody=document.querySelector("#leaderboard tbody");
     const arr=Object.entries(data).sort((a,b)=>b[1].total-a[1].total);
@@ -286,7 +282,6 @@ function updateLeaderboard(){
     });
 }
 
-// Update Event Top 3 Table
 function updateEventTop3(){
     const tableBody=document.querySelector("#eventTop3 tbody");
     tableBody.innerHTML="";
@@ -301,19 +296,79 @@ function updateEventTop3(){
         const top3=ranking.slice(0,3);
 
         const row=document.createElement("tr");
-        const eventCell=document.createElement("td");
-        eventCell.textContent=event;
-        row.appendChild(eventCell);
-        for(let i=0;i<3;i++){
-            const cell=document.createElement("td");
-            cell.textContent=top3[i]?top3[i][0]:"-";
-            row.appendChild(cell);
-        }
+        row.innerHTML=`
+        <td>${event}</td>
+        <td>${top3[0]?.[0] || "-"}</td>
+        <td>${top3[1]?.[0] || "-"}</td>
+        <td>${top3[2]?.[0] || "-"}</td>`;
         tableBody.appendChild(row);
     });
 }
 
-// Listen for real-time updates
+// ✅ FIXED EXPORT TO EXCEL
+window.exportReport = function(){
+
+    let table = `<h2>Leaderboard</h2>
+    <table border="1">
+        <tr>
+            <th>School</th>
+            <th>Total</th>
+            <th>🥇</th>
+            <th>🥈</th>
+            <th>🥉</th>
+        </tr>`;
+
+    Object.entries(data).forEach(([school, info])=>{
+        table += `
+        <tr>
+            <td>${school}</td>
+            <td>${info.total}</td>
+            <td>${info.first}</td>
+            <td>${info.second}</td>
+            <td>${info.third}</td>
+        </tr>`;
+    });
+
+    table += `</table><br><br>`;
+
+    table += `<h2>Top 3 per Event</h2>
+    <table border="1">
+        <tr>
+            <th>Event</th>
+            <th>1st</th>
+            <th>2nd</th>
+            <th>3rd</th>
+        </tr>`;
+
+    events.forEach(event=>{
+        let ranking=[];
+        schools.forEach(school=>{
+            const pos=data[school]?.events?.[event];
+            if(pos) ranking.push([school,pos]);
+        });
+
+        ranking.sort((a,b)=>a[1]-b[1]);
+        const top3=ranking.slice(0,3);
+
+        table += `
+        <tr>
+            <td>${event}</td>
+            <td>${top3[0]?.[0] || "-"}</td>
+            <td>${top3[1]?.[0] || "-"}</td>
+            <td>${top3[2]?.[0] || "-"}</td>
+        </tr>`;
+    });
+
+    table += `</table>`;
+
+    const blob = new Blob(['\ufeff', table], { type: 'application/vnd.ms-excel' });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "IT_UNIWIDE_FULL_REPORT.xls";
+    link.click();
+};
+
 onSnapshot(doc(db,"leaderboard","main"),(docSnap)=>{
     if(docSnap.exists()){
         data=docSnap.data().data;
